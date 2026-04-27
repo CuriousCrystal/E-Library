@@ -10,6 +10,7 @@ import Reader from './pages/Reader';
 import AdminPanel from './pages/AdminPanel';
 import Ebooks from './pages/Ebooks';
 import EbookReader from './pages/EbookReader';
+import Favorites from './pages/Favorites';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -44,6 +45,7 @@ function App() {
             <Route path="/login" element={<Login onLogin={handleLogin} />} />
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/login" />} />
+            <Route path="/favorites" element={user ? <Favorites /> : <Navigate to="/login" />} />
             <Route path="/reader/:bookId" element={user ? <Reader /> : <Navigate to="/login" />} />
             <Route path="/admin" element={user?.role === 'admin' ? <AdminPanel user={user} /> : <Navigate to="/login" />} />
             <Route path="/ebooks" element={<Ebooks />} />

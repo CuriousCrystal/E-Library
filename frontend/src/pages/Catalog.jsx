@@ -344,7 +344,28 @@ function LocalCatalog() {
     </form>
     {loading?<Spin/>:books.length===0?<div style={{textAlign:'center',padding:'4rem',color:'var(--text-muted)'}}><BookOpen size={48} style={{opacity:.4,marginBottom:'1rem'}}/><p>No books found. Try the World Catalog!</p></div>
       :<div className="book-grid">{books.map(b=><div key={b.id} className="book-card glass">
-        {b.coverImage?<img src={b.coverImage} alt={b.title} className="book-cover"/>:<div className="book-cover" style={{background:'linear-gradient(135deg,rgba(79,70,229,.4),rgba(192,132,252,.3))',display:'flex',alignItems:'center',justifyContent:'center'}}><BookOpen size={48} color="#818cf8"/></div>}
+        <div style={{position:'relative'}}>
+          {b.coverImage?<img src={b.coverImage} alt={b.title} className="book-cover"/>:<div className="book-cover" style={{background:'linear-gradient(135deg,rgba(79,70,229,.4),rgba(192,132,252,.3))',display:'flex',alignItems:'center',justifyContent:'center'}}><BookOpen size={48} color="#818cf8"/></div>}
+          {localStorage.getItem('token') && (
+            <button 
+              onClick={async (e) => {
+                e.stopPropagation();
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/favorites/toggle`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                  body: JSON.stringify({ bookId: b.id })
+                });
+                if (res.ok) {
+                  // Optionally update local state or show toast
+                }
+              }}
+              style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.4)', border: 'none', borderRadius: '50%', padding: '8px', cursor: 'pointer', display: 'flex' }}
+            >
+              <Heart size={20} color="#ec4899" />
+            </button>
+          )}
+        </div>
         <div className="book-info">
           <h3 className="book-title">{b.title}</h3>
           <span className="book-author">{b.author}</span>

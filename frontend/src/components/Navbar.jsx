@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, User as UserIcon, LogOut, Shield, Lock, Eye, EyeOff, X, AlertCircle } from 'lucide-react';
+import { BookOpen, User as UserIcon, LogOut, Shield, Lock, Eye, EyeOff, X, AlertCircle, Heart } from 'lucide-react';
 
 /* ── Admin Password Modal ── */
 function AdminPasswordModal({ onClose, onSuccess }) {
@@ -175,6 +175,9 @@ function Navbar({ user, onLogout }) {
                   <Shield size={16} /> Admin
                 </button>
               )}
+              <Link to="/favorites" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                <Heart size={18} /> Wishlist
+              </Link>
               <Link to="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 <UserIcon size={18} /> Dashboard
               </Link>
