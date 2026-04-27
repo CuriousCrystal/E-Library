@@ -153,7 +153,7 @@ function Navbar({ user, onLogout }) {
       <nav className="navbar glass">
         <Link to="/" className="logo" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.5rem', fontWeight: 'bold' }}>
           <BookOpen className="text-primary" />
-          <span>Lumina<span style={{ color: 'var(--primary)' }}>Lib</span></span>
+          <span>E-<span style={{ color: 'var(--primary)' }}>Library</span></span>
         </Link>
 
         <div className="nav-links">

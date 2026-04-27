@@ -19,7 +19,7 @@ function Home() {
         Discover Your Next Great Read
       </h1>
       <p>
-        Welcome to LuminaLib, your premium digital library. Explore thousands of e-books, journals, and resources available instantly from anywhere.
+        Welcome to E-Library, your premium digital library. Explore thousands of e-books, journals, and resources available instantly from anywhere.
       </p>
       
       <form onSubmit={handleSearch} className="search-bar glass" style={{ padding: '0.5rem', borderRadius: '12px' }}>
