@@ -1,22 +1,22 @@
 const { Book } = require('../models');
-const { Sequelize } = require('sequelize');
 
 exports.getAllBooks = async (req, res) => {
   try {
     const { search } = req.query;
-    let whereClause = {};
+    let query = {};
 
     if (search) {
-      whereClause = {
-        [Sequelize.Op.or]: [
-          { title: { [Sequelize.Op.like]: `%${search}%` } },
-          { author: { [Sequelize.Op.like]: `%${search}%` } },
-          { genre: { [Sequelize.Op.like]: `%${search}%` } }
+      const searchRegex = { $regex: search, $options: 'i' };
+      query = {
+        $or: [
+          { title: searchRegex },
+          { author: searchRegex },
+          { genre: searchRegex }
         ]
       };
     }
 
-    const books = await Book.findAll({ where: whereClause });
+    const books = await Book.find(query);
     res.json(books);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch books' });
@@ -25,7 +25,7 @@ exports.getAllBooks = async (req, res) => {
 
 exports.getBookById = async (req, res) => {
   try {
-    const book = await Book.findByPk(req.params.id);
+    const book = await Book.findById(req.params.id);
     if (book) res.json(book);
     else res.status(404).json({ error: 'Book not found' });
   } catch (error) {
@@ -56,9 +56,8 @@ exports.addBook = async (req, res) => {
 
 exports.deleteBook = async (req, res) => {
   try {
-    const book = await Book.findByPk(req.params.id);
+    const book = await Book.findByIdAndDelete(req.params.id);
     if (!book) return res.status(404).json({ error: 'Book not found' });
-    await book.destroy();
     res.json({ message: 'Book deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete book' });

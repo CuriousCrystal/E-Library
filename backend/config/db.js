@@ -1,29 +1,14 @@
-const { Sequelize } = require('sequelize');
-const path = require('path');
+const mongoose = require('mongoose');
 
-let sequelize;
+const connectDB = async () => {
+  try {
+    const connStr = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/elibrary';
+    await mongoose.connect(connStr);
+    console.log(`MongoDB Connected: ${mongoose.connection.host}`);
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+};
 
-if (process.env.DATABASE_URL) {
-  // Cloud Database (PostgreSQL/MySQL/etc)
-  sequelize = new Sequelize(process.env.DATABASE_URL, {
-    dialect: 'postgres',
-    protocol: 'postgres',
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false // Necessary for most cloud providers like Supabase/Neon
-      }
-    },
-    logging: false,
-  });
-} else {
-  // Local Development (SQLite)
-  const dbPath = path.join(__dirname, '../library.sqlite');
-  sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: dbPath,
-    logging: false,
-  });
-}
-
-module.exports = sequelize;
+module.exports = connectDB;

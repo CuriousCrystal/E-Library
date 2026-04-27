@@ -17,7 +17,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
-    const user = await User.findOne({ where: { username } });
+    const user = await User.findOne({ username });
 
     if (!user) return res.status(400).json({ error: 'User not found' });
 
@@ -25,11 +25,11 @@ exports.login = async (req, res) => {
     if (!validPassword) return res.status(400).json({ error: 'Invalid password' });
 
     const token = jwt.sign(
-      { id: user.id, username: user.username, role: user.role },
+      { id: user._id, username: user.username, role: user.role },
       SECRET_KEY,
       { expiresIn: '24h' }
     );
-    res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
+    res.json({ token, user: { id: user._id, username: user.username, role: user.role } });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }

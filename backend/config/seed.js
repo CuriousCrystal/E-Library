@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const { User, Book } = require('../models');
 
 async function seedData() {
-  const userCount = await User.count();
+  const userCount = await User.countDocuments();
   if (userCount === 0) {
     console.log('Seeding dummy data...');
     
@@ -15,7 +15,7 @@ async function seedData() {
     await User.create({ username: 'user', password: hashedUserPassword, role: 'user' });
 
     // Create Dummy Books
-    await Book.bulkCreate([
+    await Book.insertMany([
       {
         title: 'The Great Gatsby',
         author: 'F. Scott Fitzgerald',

@@ -1,9 +1,10 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/db');
+const mongoose = require('mongoose');
 
-const BorrowRecord = sequelize.define('BorrowRecord', {
-  borrowDate: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-  returnDate: { type: DataTypes.DATE, allowNull: true }
-});
+const borrowRecordSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  book: { type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true },
+  borrowDate: { type: Date, default: Date.now },
+  returnDate: { type: Date }
+}, { timestamps: true });
 
-module.exports = BorrowRecord;
+module.exports = mongoose.model('BorrowRecord', borrowRecordSchema);

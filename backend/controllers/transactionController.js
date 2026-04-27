@@ -5,13 +5,14 @@ exports.borrowBook = async (req, res) => {
     const { bookId } = req.body;
     const userId = req.user.id;
 
-    const book = await Book.findByPk(bookId);
+    const book = await Book.findById(bookId);
     if (!book || !book.available) {
       return res.status(400).json({ error: 'Book not available' });
     }
 
-    await BorrowRecord.create({ UserId: userId, BookId: bookId });
-    await book.update({ available: false });
+    await BorrowRecord.create({ user: userId, book: bookId });
+    book.available = false;
+    await book.save();
 
     res.json({ message: 'Book borrowed successfully' });
   } catch (error) {
@@ -28,11 +29,11 @@ exports.borrowExternal = async (req, res) => {
   }
 
   try {
-    const existingBook = await Book.findOne({ where: { title, author } });
+    const existingBook = await Book.findOne({ title, author });
 
     if (existingBook) {
       const alreadyBorrowed = await BorrowRecord.findOne({
-        where: { UserId: userId, BookId: existingBook.id, returnDate: null }
+        user: userId, book: existingBook._id, returnDate: null
       });
       if (alreadyBorrowed) {
         return res.status(400).json({ error: 'You already have this book borrowed' });
@@ -42,9 +43,10 @@ exports.borrowExternal = async (req, res) => {
         return res.status(400).json({ error: 'This book is currently borrowed by someone else' });
       }
 
-      const record = await BorrowRecord.create({ UserId: userId, BookId: existingBook.id });
-      await existingBook.update({ available: false });
-      return res.json({ message: 'Book borrowed successfully', recordId: record.id, bookId: existingBook.id });
+      const record = await BorrowRecord.create({ user: userId, book: existingBook._id });
+      existingBook.available = false;
+      await existingBook.save();
+      return res.json({ message: 'Book borrowed successfully', recordId: record._id, bookId: existingBook._id });
     }
 
     const newBook = await Book.create({
@@ -57,8 +59,8 @@ exports.borrowExternal = async (req, res) => {
       available: false
     });
 
-    const record = await BorrowRecord.create({ UserId: userId, BookId: newBook.id });
-    res.status(201).json({ message: 'Book imported and borrowed successfully', recordId: record.id, bookId: newBook.id });
+    const record = await BorrowRecord.create({ user: userId, book: newBook._id });
+    res.status(201).json({ message: 'Book imported and borrowed successfully', recordId: record._id, bookId: newBook._id });
   } catch (error) {
     res.status(500).json({ error: 'Failed to borrow book' });
   }
@@ -69,14 +71,19 @@ exports.returnBook = async (req, res) => {
     const { recordId } = req.body;
     const userId = req.user.id;
 
-    const record = await BorrowRecord.findOne({ where: { id: recordId, UserId: userId, returnDate: null } });
+    const record = await BorrowRecord.findOne({ _id: recordId, user: userId, returnDate: null });
     if (!record) {
       return res.status(400).json({ error: 'Invalid record or already returned' });
     }
 
-    await record.update({ returnDate: new Date() });
-    const book = await Book.findByPk(record.BookId);
-    await book.update({ available: true });
+    record.returnDate = new Date();
+    await record.save();
+    
+    const book = await Book.findById(record.book);
+    if (book) {
+      book.available = true;
+      await book.save();
+    }
 
     res.json({ message: 'Book returned successfully' });
   } catch (error) {
